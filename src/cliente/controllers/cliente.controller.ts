@@ -12,7 +12,7 @@ export class ClienteController {
   constructor(
       @Inject(DATA_SOURCE) private dataSource: DataSource
   ) {
-    this.clienteService = new ClienteService(dataSource, this.logger);
+    this.clienteService = new ClienteService(this.dataSource, this.logger);
   }
 
   @Get("/cpf/:cpf")

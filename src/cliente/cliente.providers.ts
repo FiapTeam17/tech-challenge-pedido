@@ -1,13 +1,5 @@
-import {
-    IAlterarClienteUseCase,
-    IClienteRepositoryGateway,
-    ICriarClienteUseCase,
-    IObterClienteUseCase
-} from "./interfaces";
-import {AlterarClienteUseCase, CriarClienteUseCase, ObterClienteUseCase} from "./usecases";
-import {DataSource} from "typeorm";
-import {ClienteModel} from "./gateways";
-import {DATA_SOURCE} from "../common/constants";
+import { IAlterarClienteUseCase, ICriarClienteUseCase, IObterClienteUseCase } from './interfaces';
+import { AlterarClienteUseCase, CriarClienteUseCase, ObterClienteUseCase } from './usecases';
 
 export const clienteProviders = [
     {
@@ -21,10 +13,5 @@ export const clienteProviders = [
     {
         provide: IObterClienteUseCase,
         useFactory: () => ObterClienteUseCase
-    },
-    {
-        provide: IClienteRepositoryGateway,
-        useFactory: (dataSource: DataSource) => dataSource.getRepository(ClienteModel),
-        inject: [DATA_SOURCE],
-    },
+    }
 ];

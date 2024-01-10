@@ -1,5 +1,6 @@
 import {ClienteDto, ClienteRetornoDto} from "../../dtos";
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { PedidoModel } from '../../../pedido/gateways';
 
 @Entity("Cliente")
 export class ClienteModel {
@@ -27,8 +28,8 @@ export class ClienteModel {
     })
     email?: string;
 
-    // @OneToMany(() => PedidoModel, (pedido) => pedido.cliente)
-    // pedidos?: PedidoModel[];
+    @OneToMany(() => PedidoModel, (pedido) => pedido.cliente)
+    pedidos?: PedidoModel[];
 
     constructor(cliente?: ClienteDto){
         if(cliente){
