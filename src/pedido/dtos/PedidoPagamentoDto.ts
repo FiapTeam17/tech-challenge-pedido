@@ -1,11 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PedidoPagamentoDto {
+
+    public readonly id: number;
+
     @ApiProperty({
         description: "Identificador do Pedido",
         example: "123456"
     })
-    public readonly IdPedido: number;
+    public readonly pedidoId: number;
+
+    @ApiProperty({
+        description: "Identificador do Pagamento",
+        example: "123456"
+    })
+    public pagamentoId?: number;
 
     @ApiProperty({
         description: "Aprovação do Pagamento do Pedido",
@@ -14,10 +23,14 @@ export class PedidoPagamentoDto {
     public foiAprovado: boolean;
 
     constructor(
-        idPedido: number,
-        foiAprovado: boolean
+        pedidoId: number,
+        pagamentoId: number,
+        foiAprovado: boolean,
+        id?: number
     ) {
-        this.IdPedido = idPedido;
+        this.pedidoId = pedidoId;
         this.foiAprovado = foiAprovado;
+        this.pagamentoId = pagamentoId;
+        this.id = id;
     }
 }

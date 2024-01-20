@@ -5,11 +5,12 @@ import { PedidoItemModel } from './models';
 import { InternalServerErrorException, Logger, NotImplementedException } from '@nestjs/common';
 import { PedidoDto } from '../dtos';
 import { PedidoStatusEnum, StatusPedidoEnumMapper } from '../types';
+import { PedidoPagamentoModel } from './models';
 
 export class PedidoMySqlRepositoryGateway implements IPedidoRepositoryGateway {
 
   private pedidoRepository: Repository<PedidoModel>;
-  // private pagamentoRepository: Repository<PagamentoModel>;
+  private pedidoPagamentoRepository: Repository<PedidoPagamentoModel>;
   private pedidoItemRepository: Repository<PedidoItemModel>;
 
   constructor(
@@ -18,7 +19,7 @@ export class PedidoMySqlRepositoryGateway implements IPedidoRepositoryGateway {
   ) {
     this.pedidoRepository = this.dataSource.getRepository(PedidoModel);
     this.pedidoItemRepository = this.dataSource.getRepository(PedidoItemModel);
-    // this.pagamentoRepository = this.dataSource.getRepository(PagamentoModel);
+    this.pedidoPagamentoRepository = this.dataSource.getRepository(PedidoPagamentoModel);
   }
 
   async criar(pedido: PedidoDto): Promise<number | undefined> {

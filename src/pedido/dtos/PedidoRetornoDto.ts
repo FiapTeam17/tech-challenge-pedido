@@ -1,6 +1,7 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
-import { PedidoDto, PedidoItemDto } from './PedidoDto';
+import { PedidoDto } from './PedidoDto';
 import { PedidoStatusEnum } from '../types';
+import { PedidoItemDto } from './PedidoItemDto';
 
 export class PedidoItemRetornoDto {
     @ApiProperty({

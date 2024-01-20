@@ -1,7 +1,7 @@
 import { PedidoEntity } from './PedidoEntity';
 import { ProdutoEntity } from '../../produto/entities';
-import { PedidoItemDto } from '../dtos';
 import { ProdutoDto } from '../../produto/dtos';
+import { PedidoItemDto } from '../dtos/PedidoItemDto';
 
 export class PedidoItemEntity {
     get id(): number | undefined{

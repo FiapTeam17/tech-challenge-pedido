@@ -1,19 +1,6 @@
-import { ProdutoDto } from '../../produto/dtos';
 import { PedidoStatusEnum } from '../types';
 import { ClienteDto } from '../../cliente/dtos';
-
-export class PedidoItemDto {
-  constructor(
-    public readonly produto: ProdutoDto,
-    public readonly quantidade: number,
-    public readonly valorUnitario: number,
-    public readonly valorTotal: number,
-    public readonly pedidoId?: number,
-    public readonly id?: number,
-  ) {
-  }
-
-}
+import { PedidoItemDto } from './PedidoItemDto';
 
 export class PedidoDto {
   constructor(
