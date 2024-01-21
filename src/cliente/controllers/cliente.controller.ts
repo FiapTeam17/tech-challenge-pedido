@@ -16,7 +16,7 @@ export class ClienteController {
   }
 
   @Get("/cpf/:cpf")
-  async obterPorCpf(cpf: string) {
+  async obterPorCpf(@Param("cpf") cpf: string) {
     return await this.clienteService.obterPorCpf(cpf);
   }
 

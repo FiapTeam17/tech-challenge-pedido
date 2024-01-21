@@ -1,13 +1,8 @@
-import {IClienteRepositoryGateway} from "../interfaces";
-import {ClienteModel} from "./models";
-import {ClienteAlterarDto, ClienteDto, ClienteRetornoDto} from "../dtos";
-import {InternalServerErrorException, Logger} from "@nestjs/common";
-import {DataSource, In, Repository} from "typeorm";
-
-class ErrorToAccessDatabaseException implements Error {
-    message: string;
-    name: string;
-}
+import { IClienteRepositoryGateway } from '../interfaces';
+import { ClienteModel } from './models';
+import { ClienteAlterarDto, ClienteDto, ClienteRetornoDto } from '../dtos';
+import { InternalServerErrorException, Logger } from '@nestjs/common';
+import { DataSource, In, Repository } from 'typeorm';
 
 export class ClienteMySqlRepositoryGateway implements IClienteRepositoryGateway {
 
@@ -21,63 +16,47 @@ export class ClienteMySqlRepositoryGateway implements IClienteRepositoryGateway 
     }
 
     async alterar(dto: ClienteAlterarDto): Promise<ClienteRetornoDto> {
-        try {
-            const clienteModel = await this.clienteRepository.save(new ClienteModel(dto));
-            return clienteModel.getClientDto();
 
-        } catch (e) {
-            this.logger.error(e);
-            throw new ErrorToAccessDatabaseException();
+        const clienteModel = new ClienteModel(dto);
+        const result= await this.clienteRepository.update(dto.id, clienteModel);
+        if(result.affected !== 1){
+            throw new InternalServerErrorException("Erro ao atualizar os dados");
         }
+
+        return clienteModel.getClientDto();
     }
 
     async criar(dto: ClienteDto): Promise<ClienteRetornoDto> {
-        try {
-            const clienteModel = await this.clienteRepository.save(new ClienteModel(dto));
-            return clienteModel.getClientDto();
-        } catch (e) {
-            this.logger.error(e);
-            throw new ErrorToAccessDatabaseException();
-        }
+
+        const clienteModel = await this.clienteRepository.save(new ClienteModel(dto));
+        return clienteModel.getClientDto();
     }
 
     async obterPorCpf(cpf: string): Promise<ClienteDto> {
-        try {
-            const clienteEntity = await this.clienteRepository.findOneBy(
-                {
-                    cpf: In([cpf])
-                });
-            return clienteEntity?.getClientDto();
-        } catch (e) {
-            this.logger.error(e);
-            throw new InternalServerErrorException("Não foi possível se conectar ao banco de dados!");
-        }
+
+        const clienteEntity = await this.clienteRepository.findOneBy(
+          {
+              cpf: In([cpf])
+          });
+        return clienteEntity?.getClientDto();
     }
 
     async obterPorEmail(email: string): Promise<ClienteDto> {
-        try {
-            const clienteEntity = await this.clienteRepository.findOneBy(
-                {
-                    email: In([email])
-                });
-            return clienteEntity?.getClientDto();
-        } catch (e) {
-            this.logger.error(e);
-            throw new ErrorToAccessDatabaseException();
-        }
+
+        const clienteEntity = await this.clienteRepository.findOneBy(
+          {
+              email: In([email])
+          });
+        return clienteEntity?.getClientDto();
     }
 
     async obterPorId(id: number): Promise<ClienteDto> {
-        try {
-            const clienteEntity = await this.clienteRepository.findOneBy(
-                {
-                    id: In([id])
-                });
 
-            return clienteEntity?.getClientDto()
-        } catch (e) {
-            this.logger.error(e);
-            throw new ErrorToAccessDatabaseException();
-        }
+        const clienteEntity = await this.clienteRepository.findOneBy(
+          {
+              id: In([id])
+          });
+
+        return clienteEntity?.getClientDto();
     }
 }

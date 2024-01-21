@@ -25,7 +25,7 @@ export class ObterClienteUseCase implements  IObterClienteUseCase{
 
     private getClienteDto(clienteOp: ClienteDto): ClienteRetornoDto {
         if (clienteOp == null) {
-            throw new BadRequestException("Cliente não  encontrado!");
+            throw new BadRequestException("Cliente não encontrado!");
         }
 
         return clienteOp;
