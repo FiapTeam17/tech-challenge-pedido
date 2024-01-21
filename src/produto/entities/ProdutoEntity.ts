@@ -16,8 +16,10 @@ export class ProdutoEntity {
             throw new BadRequestException("Nome é obrigatório");
         }else if(!this.valor){
             throw new BadRequestException("Valor é obrigatório");
+        }else if(this.valor <= 0){
+          throw new BadRequestException("Valor deve ser maior que zero");
         }
-        else if(!this.categoria === undefined){
+        else if(this.categoria === undefined){
             throw new BadRequestException("Categoria é obrigatória");
         }
     }

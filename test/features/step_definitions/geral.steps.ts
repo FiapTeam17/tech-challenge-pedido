@@ -4,6 +4,17 @@ import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
 import * as assert from 'assert';
 
+function dataTableToJson(cabecalho: string[],linha: string[]): any{
+  let dado = '';
+  for (let j = 0; j < linha.length; j++) {
+    if(dado !== ''){
+      dado += ',';
+    }
+    dado += `"${cabecalho[j]}":"${linha[j]}"`;
+  }
+  return JSON.parse(`{${dado}}`);
+}
+
 interface Context {
   app: any;
   response: request.Response;
@@ -39,27 +50,16 @@ Then('status do retorno é {string}', function(this: Context, status: string ) {
   assert.equal(this.response.status, status);
 });
 
-Given(/^clientes já cadastrados com os dados:$/, async function(table: DataTable) {
+Given('{string} já cadastrados com os dados:', async function(rota: string, table: DataTable) {
   const linhas = table.raw();
   const cabecalho = linhas[0];
-
   for (let i = 1; i < linhas.length; i++) {
     const linha = linhas[i];
-    let dado = '';
-
-    for (let j = 0; j < linha.length; j++) {
-      if(dado !== ''){
-        dado += ',';
-      }
-      dado += `"${cabecalho[j]}":"${linha[j]}"`;
-    }
-    const json = JSON.parse(`{
-      ${dado}
-      }
-    `);
-    await request(this.app.getHttpServer()).post('/clientes')
+    const json = dataTableToJson(cabecalho, linha);
+    await request(this.app.getHttpServer()).post(`/${rota}`)
       .send(json)
       .set('Accept', 'application/json')
       .expect(201);
   }
 });
+

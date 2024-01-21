@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CATEGORIAS_PRODUTO, ProdutoCategoriaEnum, ProdutoCategoriaEnumMapper } from '../types';
+import { ProdutoCategoriaEnum } from '../types';
 
 export class ProdutoDto {
 
