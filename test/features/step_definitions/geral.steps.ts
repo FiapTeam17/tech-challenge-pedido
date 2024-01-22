@@ -73,7 +73,7 @@ When('pesquiso rota {string} pelo campo {string} e valor {string}', async functi
   this.response = await request(this.app.getHttpServer()).get(url);
 });
 
-Then('json com {string} {string} é retornado se status {int}', function(this: Context, campo: string, valor: string, status: number) {
+Then('json com {string} {} é retornado se status {int}', function(this: Context, campo: string, valor: any, status: number) {
   if(this.response.status === status){
     const resp = JSON.parse(this.response.text);
     assert.equal(resp[campo], valor);
@@ -90,4 +90,14 @@ When('altero {string} com {string}', async function(this: Context, rota: string,
   this.response = await request(this.app.getHttpServer()).put(`/${rota}/${this.campo}`)
     .send(this.body)
     .set('Accept', 'application/json');
+});
+
+Then('a quantidade de registros retornados é {}', function(this: Context, qtd: number) {
+  const resp = JSON.parse(this.response.text);
+  const retorno = resp.length ? resp.length : 0;
+  assert.equal(retorno, qtd);
+});
+
+When('excluo {string}', async function(this: Context, rota: string) {
+  this.response = await request(this.app.getHttpServer()).delete(`/${rota}/${this.campo}`);
 });

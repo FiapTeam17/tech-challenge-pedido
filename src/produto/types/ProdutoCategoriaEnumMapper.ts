@@ -1,5 +1,5 @@
-import { ProdutoCategoriaEnum } from "./ProdutoCategoriaEnum";
-import { InternalServerErrorException } from '@nestjs/common';
+import { ProdutoCategoriaEnum } from './ProdutoCategoriaEnum';
+import { BadRequestException } from '@nestjs/common';
 
 export class ProdutoCategoriaEnumMapper {
     static numberParaEnum(codigo?: number): ProdutoCategoriaEnum{
@@ -13,7 +13,7 @@ export class ProdutoCategoriaEnumMapper {
             case 3:
                 return ProdutoCategoriaEnum.SOBREMESA;
             default:
-                throw new InternalServerErrorException("Categoria Inválida");
+                throw new BadRequestException("Categoria Inválida");
         }
     }
 
@@ -28,7 +28,7 @@ export class ProdutoCategoriaEnumMapper {
             case "SOBREMESA":
                 return ProdutoCategoriaEnum.SOBREMESA;
             default:
-                throw new InternalServerErrorException("Categoria Inválida");
+                throw new BadRequestException("Categoria Inválida");
         }
     }
 
@@ -43,7 +43,7 @@ export class ProdutoCategoriaEnumMapper {
             case "SOBREMESA":
                 return 3;
             default:
-                throw new InternalServerErrorException("Categoria Inválida");
+                throw new BadRequestException("Categoria Inválida");
         }
     }
 

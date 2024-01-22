@@ -20,8 +20,7 @@ export class ObterProdutoUseCase implements IObterProdutoUseCase{
     }
 
     public async obterPorCategoria(categoria: string): Promise<ProdutoRetornoDto[]> {
-        const produtos = await this.produtoRepositoryGateway.obterPorCategoria(
+        return await this.produtoRepositoryGateway.obterPorCategoria(
           ProdutoCategoriaEnumMapper.stringParaEnum(categoria.toUpperCase()));
-        return produtos;
     }
 }

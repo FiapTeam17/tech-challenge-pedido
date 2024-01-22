@@ -25,56 +25,34 @@ export class ProdutoMySqlRepositoryGateway implements IProdutoRepositoryGateway 
             if(e.code === 'ER_ROW_IS_REFERENCED_2'){
                 throw new BadRequestException("Produto utilizado em pedidos!");
             }
-
-            this.logger.error(e);
-            throw new InternalServerErrorException("Não foi possível se conectar ao banco de dados!");
+            throw e;
         }
     }
 
     async obterPorId(id: number): Promise<ProdutoRetornoDto> {
-        try {
-            const produtoEntity = await this.produtoRepository.findOneBy({ id: Equal(id) });
 
-            return produtoEntity?.getProdutoDto();
-
-        } catch (e) {
-            this.logger.error(e);
-            throw new InternalServerErrorException("Não foi possível se conectar ao banco de dados!");
-        }
+        const produtoEntity = await this.produtoRepository.findOneBy({ id: Equal(id) });
+        return produtoEntity?.getProdutoDto();
     }
 
     async obterPorCategoria(categoria: ProdutoCategoriaEnum): Promise<ProdutoRetornoDto[]> {
-        try {
-            const produtosEntities = await this.produtoRepository.findBy({
-                categoria: Equal(ProdutoCategoriaEnumMapper.enumParaString(categoria))
-            });
-            return produtosEntities.map(pe => pe.getProdutoDto());
 
-        } catch (e) {
-            this.logger.error(e);
-            throw new InternalServerErrorException("Não foi possível se conectar ao banco de dados!");
-        }
+        const produtosEntities = await this.produtoRepository.findBy({
+            categoria: Equal(ProdutoCategoriaEnumMapper.enumParaString(categoria))
+        });
+        return produtosEntities.map(pe => pe.getProdutoDto());
     }
     async criar(dto: ProdutoCriarDto): Promise<ProdutoRetornoDto> {
-        try {
-            const retornoDto = await this.produtoRepository.save(new ProdutoModel(dto));
 
-            return retornoDto.getProdutoDto();
-
-        } catch (e) {
-            this.logger.error(e);
-            throw new InternalServerErrorException("Não foi possível se conectar ao banco de dados!");
-        }
-
+        const retornoDto = await this.produtoRepository.save(new ProdutoModel(dto));
+        return retornoDto.getProdutoDto();
     }
     async alterar(produto: ProdutoAlterarDto): Promise<ProdutoRetornoDto> {
-        try {
-            const retornoDto = await this.produtoRepository.save(new ProdutoModel(produto));
-            return retornoDto.getProdutoDto();
-        } catch (e) {
-            this.logger.error(e);
-            throw new InternalServerErrorException("Não foi possível se conectar ao banco de dados!");
+        const produtoModel = new ProdutoModel(produto);
+        const retornoDto = await this.produtoRepository.update(produtoModel.id, produtoModel);
+        if(retornoDto.affected !== 1){
+            throw new InternalServerErrorException("Não foi possível atualizar o produto");
         }
-
+        return produtoModel.getProdutoDto();
     }
 }

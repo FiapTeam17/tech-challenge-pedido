@@ -1,7 +1,7 @@
 module.exports = {
   default: {
     paths: ['test/features/**/*.feature'],
-    parallel: 3,
+    parallel: 5,
     format: [
       'progress-bar',
       ['junit','cucumber-report.xml'],

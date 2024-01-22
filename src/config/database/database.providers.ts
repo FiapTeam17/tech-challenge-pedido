@@ -6,7 +6,7 @@ export const databaseProviders = [
     {
         provide: DATA_SOURCE,
         useFactory: async () => {
-            const ambiente = process.env.NODE_ENV.toUpperCase().trim();
+            const ambiente = process.env.NODE_ENV?.toUpperCase().trim();
             let dataSource: DataSource;
             if(ambiente === "TEST"){
                 dataSource = new DataSource({

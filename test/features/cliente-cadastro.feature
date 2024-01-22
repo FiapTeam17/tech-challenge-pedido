@@ -29,7 +29,7 @@ Feature: Cadastro de Cliente
       When pesquiso rota "clientes" pelo campo <campo> e valor <valor>
       Then status do retorno é <status>
       And a mensagem de retorno é <mensagem>
-      And json com "cpf" "99210154002" é retornado se status 200
+      And json com "cpf" 99210154002 é retornado se status 200
 
       Examples:
         | campo   |   valor            | status | mensagem |
@@ -51,6 +51,6 @@ Feature: Cadastro de Cliente
       And json com <campo> <valor> é retornado se status 200
       Examples:
       | body                                                                | campo   | valor             | status |
-      | '{"cpf":"99210154002","nome":"Novo Nome","email":"teste@teste.com"}'| 'nome'  | 'Novo Nome'       | '200'  |
-      | '{"cpf":"99210154002","nome":"Teste","email":"novo@teste.com"}'     | 'email' | 'novo@teste.com'  | '200'  |
+      | '{"cpf":"99210154002","nome":"Novo Nome","email":"teste@teste.com"}'| 'nome'  | Novo Nome       | '200'  |
+      | '{"cpf":"99210154002","nome":"Teste","email":"novo@teste.com"}'     | 'email' | novo@teste.com  | '200'  |
 

@@ -15,8 +15,8 @@ export class ProdutoController {
   ) {
     this.produtoService = new ProdutoService(this.dataSource, this.logger);
   }
-  @Get("/categorias/:categoria/produtos")
 
+  @Get("/produtos/categoria/:categoria")
   async obterPorCategoria(@Param("categoria") categoria: string): Promise<ProdutoRetornoDto[]> {    
     return await this.produtoService.obterPorCategoria(categoria);
   }
