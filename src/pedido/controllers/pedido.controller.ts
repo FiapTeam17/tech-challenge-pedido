@@ -19,14 +19,12 @@ export class PedidoController {
 
     @Get("/andamento")    
     async obterEmAndamento(): Promise<PedidoEmAndamentoDto[]> {
-
         return await this.pedidoService.obterEmAndamento();
     }
 
     @Get("/:id")    
-    async obterPorId(@Param("id") id: number): Promise<PedidoRetornoDto> {        
-        const pedido = await this.pedidoService.obterPorId(id);        
-        return pedido;
+    async obterPorId(@Param("id") id: number): Promise<PedidoRetornoDto> {
+        return await this.pedidoService.obterPorId(id);
     }
 
     @Post("")    

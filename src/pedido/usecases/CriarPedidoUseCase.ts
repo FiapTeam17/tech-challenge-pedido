@@ -1,12 +1,13 @@
 import { ICriarPedidoUseCase, IPedidoRepositoryGateway } from '../interfaces';
 import { IObterProdutoUseCase } from '../../produto/interfaces';
 import { IObterClienteUseCase } from '../../cliente/interfaces';
-import { BadRequestException, Logger, NotImplementedException } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { PedidoCriarDto } from '../dtos';
 import { PedidoCriarRetornoDto } from '../dtos/PedidoCriarRetornoDto';
 import { PedidoEntity, PedidoItemEntity } from '../entities';
 import { ClienteEntity } from '../../cliente/entities';
 import { ProdutoEntity } from '../../produto/entities';
+import { PedidoStatusEnum } from '../types';
 
 export class CriarPedidoUseCase implements ICriarPedidoUseCase {
 
@@ -21,22 +22,19 @@ export class CriarPedidoUseCase implements ICriarPedidoUseCase {
     ) { }
 
     async criar(pedidoDto: PedidoCriarDto): Promise<PedidoCriarRetornoDto> {
-
-        throw new NotImplementedException();
         //TODO adicionar mapper
-        
-        // const pedido = this.dtoToDomain(pedidoDto);
-        //
-        // await this.verificaRemoveClienteInexistente(pedido);
-        // await this.verificaExistenciaProduto(pedido);
-        //
-        // pedido.dataCadastro = new Date(Date.now());
-        // pedido.setStatus(PedidoStatusEnum.AGUARDANDO_CONFIRMACAO_PAGAMENTO);
-        //
-        // const id = await this.pedidoRepositoryGateway.criar(pedido.toPedidoDto());
-        // if (id !== undefined) {
-        //     pedido.id = id;
-        // }
+        const pedido = this.dtoToDomain(pedidoDto);
+
+        await this.verificaRemoveClienteInexistente(pedido);
+        await this.verificaExistenciaProduto(pedido);
+
+        pedido.dataCadastro = new Date(Date.now());
+        pedido.setStatus(PedidoStatusEnum.AGUARDANDO_CONFIRMACAO_PAGAMENTO);
+
+        const id = await this.pedidoRepositoryGateway.criar(pedido.toPedidoDto());
+        if (id !== undefined) {
+            pedido.id = id;
+        }
 
         // let pag = new PagamentoDto(undefined, pedido.id);
         //
@@ -47,15 +45,15 @@ export class CriarPedidoUseCase implements ICriarPedidoUseCase {
         //
         // await this.definirQrCodePagamentoUseCase.atualizar(pag.id as number, pag.qrCode);
         //
-        // const respPedidoDto = pedido.toPedidoDto();
-        //
-        // const resp : PedidoCriarRetornoDto = {...respPedidoDto, qrCodeMercadoPago: qrCodeResponseDto.qr_data, itens: []};
-        //
-        // for (let i = 0; i < respPedidoDto.itens!.length; i++) {
-        //     resp.itens.push({...respPedidoDto.itens![i]});
-        // }
-        //
-        // return resp;
+        const respPedidoDto = pedido.toPedidoDto();
+
+        const resp : PedidoCriarRetornoDto = {...respPedidoDto, qrCodeMercadoPago: undefined, itens: []};
+
+        for (let i = 0; i < respPedidoDto.itens!.length; i++) {
+            resp.itens.push({...respPedidoDto.itens![i]});
+        }
+
+        return resp;
     }
 
     private async verificaRemoveClienteInexistente(pedido: PedidoEntity) {
@@ -82,9 +80,16 @@ export class CriarPedidoUseCase implements ICriarPedidoUseCase {
                 throw new BadRequestException("Produto não encontrado!");
             }
 
+            if(item.quantidade === undefined){
+                throw new BadRequestException("A quantidade deve ser informada!");
+            }
+
+            if(item.quantidade <= 0){
+                throw new BadRequestException("A quantidade deve ser maior que zero!");
+            }
+
             const produtoOp = await this.obterProdutoUseCase.obterPorId(produto.id as never);
             if (produtoOp == undefined) {
-                this.logger.warn("Produto informado não existe. produto.id={}", produto.id)
                 throw new BadRequestException("Produto não encontrado!");
             }
 
@@ -101,7 +106,7 @@ export class CriarPedidoUseCase implements ICriarPedidoUseCase {
 
         const pedido = new PedidoEntity(undefined, cliente, pedidoDto.observacao);
 
-        pedido.itens = pedidoDto.itens.map(i => {
+        pedido.itens = pedidoDto.itens?.map(i => {
             return new PedidoItemEntity(undefined, pedido,
               new ProdutoEntity(i.produtoId),
               i.quantidade);
