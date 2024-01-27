@@ -25,7 +25,7 @@ export const databaseProviders = [
                     port: db_port,
                     username: process.env.DB_USERNAME || "root",
                     password: process.env.DB_PASSWORD || "senha",
-                    database: process.env.DB_SCHEMA || "sgr_database",
+                    database: process.env.DB_SCHEMA || "sgr_database_pedido",
                     entities: [
                         __dirname + '/../../**/*.model{.ts,.js}',
                     ],
