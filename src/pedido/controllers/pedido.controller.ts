@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, Get, Inject, Logger, Param, Patc
 import { PedidoService } from '../services';
 import { DATA_SOURCE } from '../../common/constants';
 import { DataSource } from 'typeorm';
-import { PedidoCriarDto, PedidoEmAndamentoDto, PedidoPagamentoDto, PedidoRetornoDto, PedidoStatusDto } from '../dtos';
+import { PedidoCriarDto, PedidoPagamentoDto, PedidoRetornoDto, PedidoStatusDto } from '../dtos';
 import { PedidoCriarRetornoDto } from '../dtos/PedidoCriarRetornoDto';
 import { StatusPedidoEnumMapper } from '../types';
 
@@ -15,11 +15,6 @@ export class PedidoController {
       @Inject(DATA_SOURCE) private dataSource: DataSource
     ) {
         this.pedidoService = new PedidoService(this.dataSource, this.logger);
-    }
-
-    @Get("/andamento")    
-    async obterEmAndamento(): Promise<PedidoEmAndamentoDto[]> {
-        return await this.pedidoService.obterEmAndamento();
     }
 
     @Get("/:id")    
@@ -38,24 +33,5 @@ export class PedidoController {
             throw new BadRequestException("Status deve ser informado");
         }
         await this.pedidoService.atualizarStatus(id, StatusPedidoEnumMapper.stringParaEnum(pedidoDto.status as unknown as string));
-    }
-
-    @Get()
-    async obterPedidosPorStatus(
-        @Query("status") status: string,
-        @Query("identificadorPagamento") identificadorPagamento: string): Promise<PedidoRetornoDto[]> {
-
-        return await this.pedidoService.obterPorStatusAndIdentificadorPagamento(status, identificadorPagamento);
-    }
-
-    @Get("/pagamentos/:idPagamento")
-    async obterPedidosPorIdentificadorPagamento(@Param("idPagamento") idPagamento: string): Promise<PedidoRetornoDto> {
-
-        return await this.pedidoService.obterPorIdentificadorPagamento(idPagamento);
-    }
-
-    @Get("/:idPedido/statusPagamento")
-    async consultarPagamentos(@Param("idPedido") idPedido: number): Promise<PedidoPagamentoDto> {
-        return await this.pedidoService.consultaStatusPagamento(idPedido);
     }
 }

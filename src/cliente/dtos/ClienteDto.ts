@@ -12,25 +12,18 @@ export class ClienteDto {
         description: "Nome do cliente",
         example: "Cliente teste"
     })
-    public readonly nome?: string;
+    public nome?: string;
 
     @ApiProperty({
         description: "CPF",
         minimum: 11,
         example: "12345678909"
     })
-    public readonly cpf?: string;
+    public cpf?: string;
 
     @ApiProperty({
         description: "E-mail",
         example: "cliente@teste.com.br"
     })
-    public readonly email?: string;
-
-    constructor(nome?: string, cpf?: string, email?: string, id?: number) {
-        this.id = id;
-        this.nome = nome;
-        this.cpf = cpf;
-        this.email = email;
-    }
+    public email?: string;
 }

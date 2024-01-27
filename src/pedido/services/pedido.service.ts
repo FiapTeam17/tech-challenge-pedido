@@ -13,8 +13,8 @@ import { ObterClienteUseCase } from '../../cliente/usecases';
 import { ProdutoMySqlRepositoryGateway } from '../../produto/gateways';
 import { ObterProdutoUseCase } from '../../produto/usecases';
 import { PedidoMySqlRepositoryGateway } from '../gateways';
-import { AtualizarStatusPedidoUseCase, CriarPedidoUseCase, ObterPedidoUseCase } from '../usecases';
-import { PedidoCriarDto, PedidoEmAndamentoDto, PedidoPagamentoDto, PedidoRetornoDto } from '../dtos';
+import { AtualizarStatusPedidoUseCase, CriarPedidoUseCase } from '../usecases';
+import { PedidoCriarDto, PedidoRetornoDto } from '../dtos';
 import { PedidoCriarRetornoDto } from '../dtos/PedidoCriarRetornoDto';
 import { PedidoStatusEnum } from '../types';
 
@@ -68,22 +68,6 @@ export class PedidoService {
 
   async obterPorId(id: number): Promise<PedidoRetornoDto> {
     return await this.obterPedidoUseCase.obterPorId(id);
-  }
-
-  async obterEmAndamento(): Promise<PedidoEmAndamentoDto[]> {
-    return await this.obterPedidoUseCase.obterEmAndamento();
-  }
-
-  async obterPorStatusAndIdentificadorPagamento(status: string, identificadorPagamento: string): Promise<PedidoRetornoDto[]> {
-    return await this.obterPedidoUseCase.obterPorStatusAndIdentificadorPagamento(status, identificadorPagamento);
-  }
-
-  async obterPorIdentificadorPagamento(identificadorPagamento: string): Promise<PedidoRetornoDto> {
-    return await this.obterPedidoUseCase.obterPorIdentificadorPagamento(identificadorPagamento);
-  }
-
-  async consultaStatusPagamento(idPedido: number): Promise<PedidoPagamentoDto> {
-    return await this.obterPedidoUseCase.consultaStatusPagamento(idPedido);
   }
 
   async criar(pedido: PedidoCriarDto): Promise<PedidoCriarRetornoDto> {

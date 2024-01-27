@@ -27,4 +27,7 @@ Feature: Cadastro de pedido
       | Teste | 99210154002  | teste@teste.com |
     When é enviado '{"itens":[{"produtoId":"1", "quantidade":2}]}' para "pedidos"
     Then status do retorno é '201'
+    And json com "status" 0 é retornado se status 201
+
+
 

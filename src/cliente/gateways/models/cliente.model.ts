@@ -38,9 +38,7 @@ export class ClienteModel {
             }
             this.nome = cliente.nome;
             this.email = cliente.email;
-            if(cliente.cpf) {
-                this.cpf = cliente.cpf;
-            }
+            this.cpf = cliente.cpf;
         }
     }
 

@@ -1,11 +1,9 @@
 import { DataSource, Repository } from 'typeorm';
-import { IPedidoRepositoryGateway } from "../interfaces";
-import { PedidoModel } from './models';
-import { PedidoItemModel } from './models';
-import { InternalServerErrorException, Logger, NotImplementedException } from '@nestjs/common';
+import { IPedidoRepositoryGateway } from '../interfaces';
+import { PedidoItemModel, PedidoModel, PedidoPagamentoModel } from './models';
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { PedidoDto } from '../dtos';
-import { PedidoStatusEnum, StatusPedidoEnumMapper } from '../types';
-import { PedidoPagamentoModel } from './models';
+import { StatusPedidoEnumMapper } from '../types';
 
 export class PedidoMySqlRepositoryGateway implements IPedidoRepositoryGateway {
 
@@ -60,33 +58,6 @@ export class PedidoMySqlRepositoryGateway implements IPedidoRepositoryGateway {
     }
   }
 
-  async obterEmAndamento(): Promise<PedidoDto[]> {
-    try {      
-      const pedidos: PedidoDto[] = [];
-
-      const pedidoEntity = await this.pedidoRepository
-        .createQueryBuilder("ped")
-        .where("ped.status in(:...status)", {
-          status: [
-            StatusPedidoEnumMapper.enumParaNumber(PedidoStatusEnum.RECEBIDO),
-            StatusPedidoEnumMapper.enumParaNumber(PedidoStatusEnum.EM_PREPARACAO),
-            StatusPedidoEnumMapper.enumParaNumber(PedidoStatusEnum.PRONTO)
-          ]
-        })
-        .getMany();
-
-      pedidoEntity.forEach(pe => {
-        pedidos.push(pe.getDto());
-      });
-
-      return pedidos;
-    }
-    catch (e) {
-      this.logger.error(e);
-      throw new InternalServerErrorException("Não foi possível se conectar ao banco de dados!");
-    }
-  }
-
   async obterPorId(pedidoId: number): Promise<PedidoDto> {
     try {
       const pedidoEntity = await this.pedidoRepository
@@ -104,51 +75,5 @@ export class PedidoMySqlRepositoryGateway implements IPedidoRepositoryGateway {
       this.logger.error(e);
       throw new InternalServerErrorException("Não foi possível se conectar ao banco de dados!");
     }
-  }
-
-  async obterPorStatusAndIdentificadorPagamento(status: PedidoStatusEnum, identificadorPagamento: string): Promise<PedidoDto[]> {
-    try {
-      const pedidos: PedidoDto[] = [];
-
-      //TODO: implementar filtro de "identificadorPagamento"
-
-      const pedidoEntity = await this.pedidoRepository
-        .createQueryBuilder("ped")
-        .where("ped.status = :status", {
-          status: StatusPedidoEnumMapper.enumParaString(status)
-        }).getMany();
-
-      pedidoEntity.forEach(pe => {
-        pedidos.push(pe.getDto());
-      })
-
-      return pedidos;
-    } catch (error) {
-      this.logger.error(error);
-      throw new InternalServerErrorException("Não foi possível se conectar ao banco de dados!");
-    }
-  }
-
-  async obterPorIdentificadorPagamento(identificadorPagamento: string): Promise<PedidoDto> {
-    throw new NotImplementedException();
-    // TODO: integração
-    // try {
-
-      // const pagamento = await this.pagamentoRepository.findOneBy({
-      //   codigoPagamento: identificadorPagamento
-      // });
-      //
-      // let pedidoOp: PedidoDto;
-      // if (pagamento !== null && pagamento.pedido !== undefined) {
-      //   const pedidoEntity = pagamento.pedido;
-      //   pedidoOp = pedidoEntity?.getDto();
-      // }
-      //
-      // return pedidoOp;
-    // }
-    // catch (e) {
-    //   this.logger.error(e);
-    //   throw new InternalServerErrorException("Não foi possível se conectar ao banco de dados!");
-    // }
   }
 }

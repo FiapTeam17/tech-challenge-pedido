@@ -14,7 +14,7 @@ export class AlterarClienteUseCase implements IAlterarClienteUseCase{
 
         const clienteRetornoDto = await this.clienteRepositoryGateway.obterPorId(paramsDto.id);
         if(!clienteRetornoDto){
-            throw new BadRequestException("");
+            throw new BadRequestException("Cliente não encontrado!");
         }
 
         const cliente = this.mapDtoToDomain(paramsDto);
