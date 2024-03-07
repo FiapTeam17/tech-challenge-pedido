@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import {DATA_SOURCE} from "../../common/constants";
+import { DATA_SOURCE } from "../../common/constants";
 
 const db_port: number | undefined = parseInt(process.env.DB_PORT || "3306");
 export const databaseProviders = [
@@ -8,7 +8,7 @@ export const databaseProviders = [
         useFactory: async () => {
             const ambiente = process.env.NODE_ENV?.toUpperCase().trim();
             let dataSource: DataSource;
-            if(ambiente === "TEST"){
+            if (ambiente === "TEST") {
                 dataSource = new DataSource({
                     type: 'better-sqlite3',
                     database: ':memory:',
@@ -18,7 +18,7 @@ export const databaseProviders = [
                     dropSchema: true,
                     synchronize: true,
                 });
-            }else{
+            } else {
                 dataSource = new DataSource({
                     type: 'mysql',
                     host: process.env.DB_HOST || "localhost",
@@ -29,7 +29,7 @@ export const databaseProviders = [
                     entities: [
                         __dirname + '/../../**/*.model{.ts,.js}',
                     ],
-                    dropSchema: true,
+                    dropSchema: false,
                     synchronize: true,
                 });
             }

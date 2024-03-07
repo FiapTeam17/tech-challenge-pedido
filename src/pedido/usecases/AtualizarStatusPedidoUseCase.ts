@@ -3,11 +3,19 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { PedidoStatusEnum } from '../types';
 import { PedidoDto } from '../dtos';
 import { PedidoEntity } from '../entities';
+import { ISqsGateway } from '../interfaces/ISqsGateway';
 
-export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCase{
+export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCase {
+
+    private sqsUrl: string;
+
     constructor(
         private pedidoRepositoryGateway: IPedidoRepositoryGateway,
-        private logger: Logger) { }
+        private readonly sqsGateway: ISqsGateway,
+        private logger: Logger
+    ) {
+        this.sqsUrl = process.env.QUEUE_URL || "https://sqs.us-east-1.amazonaws.com/637423294426/";
+    }
 
     async atualizarStatus(pedidoId: number, status: PedidoStatusEnum): Promise<void> {
         const pedidoDto: PedidoDto = await this.pedidoRepositoryGateway.obterPorId(pedidoId);
@@ -19,5 +27,12 @@ export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCa
         const pedido = PedidoEntity.getInstance(pedidoDto);
         pedido.setStatus(status);
         await this.pedidoRepositoryGateway.atualizarStatus(pedido.toPedidoDto());
+
+        const filaProducao: any = {
+            idPedido: pedido.id,
+            status: pedido.getStatus()
+        };
+
+        this.sqsGateway.sendMessage(this.sqsUrl.concat("pedido-to-producao-atualiza-status"), filaProducao);
     }
 }

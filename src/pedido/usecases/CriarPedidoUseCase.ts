@@ -8,18 +8,24 @@ import { PedidoEntity, PedidoItemEntity } from '../entities';
 import { ClienteEntity } from '../../cliente/entities';
 import { ProdutoEntity } from '../../produto/entities';
 import { PedidoStatusEnum } from '../types';
+import { ISqsGateway } from '../interfaces/ISqsGateway';
 
 export class CriarPedidoUseCase implements ICriarPedidoUseCase {
+
+    private sqsUrl: string;
 
     constructor(
         private pedidoRepositoryGateway: IPedidoRepositoryGateway,
         private obterProdutoUseCase: IObterProdutoUseCase,
         private obterClienteUseCase: IObterClienteUseCase,
+        private readonly sqsGateway: ISqsGateway,
         // private gerarQrCodeMpUseCase: IGerarQrCodeMpUseCase,
         // private criarPagamentoUseCase: ICriarPagamentoUseCase,
         // private definirQrCodePagamentoUseCase: IDefinirQrCodePagamentoUseCase,
         private logger: Logger
-    ) { }
+    ) {
+        this.sqsUrl = process.env.QUEUE_URL || "https://sqs.us-east-1.amazonaws.com/637423294426/";
+    }
 
     async criar(pedidoDto: PedidoCriarDto): Promise<PedidoCriarRetornoDto> {
         //TODO adicionar mapper
@@ -36,6 +42,16 @@ export class CriarPedidoUseCase implements ICriarPedidoUseCase {
             pedido.id = id;
         }
 
+        this.sqsGateway.sendMessage(this.sqsUrl.concat("pedido-to-producao-criar-pedido"), pedidoDto);
+
+        const filaPagamento: any = {
+
+            idPedido: pedido.id,
+            valorTotal: pedido.valorTotal,
+        };
+
+        this.sqsGateway.sendMessage(this.sqsUrl.concat("pedido-to-pagamento"), filaPagamento);
+
         // let pag = new PagamentoDto(undefined, pedido.id);
         //
         // pag = await this.criarPagamentoUseCase.criar(pag);
@@ -47,10 +63,10 @@ export class CriarPedidoUseCase implements ICriarPedidoUseCase {
         //
         const respPedidoDto = pedido.toPedidoDto();
 
-        const resp : PedidoCriarRetornoDto = {...respPedidoDto, qrCodeMercadoPago: undefined, itens: []};
+        const resp: PedidoCriarRetornoDto = { ...respPedidoDto, qrCodeMercadoPago: undefined, itens: [] };
 
         for (let i = 0; i < respPedidoDto.itens!.length; i++) {
-            resp.itens.push({...respPedidoDto.itens![i]});
+            resp.itens.push({ ...respPedidoDto.itens![i] });
         }
 
         return resp;
@@ -80,11 +96,11 @@ export class CriarPedidoUseCase implements ICriarPedidoUseCase {
                 throw new BadRequestException("Produto não encontrado!");
             }
 
-            if(item.quantidade === undefined){
+            if (item.quantidade === undefined) {
                 throw new BadRequestException("A quantidade deve ser informada!");
             }
 
-            if(item.quantidade <= 0){
+            if (item.quantidade <= 0) {
                 throw new BadRequestException("A quantidade deve ser maior que zero!");
             }
 
@@ -108,8 +124,8 @@ export class CriarPedidoUseCase implements ICriarPedidoUseCase {
 
         pedido.itens = pedidoDto.itens?.map(i => {
             return new PedidoItemEntity(undefined, pedido,
-              new ProdutoEntity(i.produtoId),
-              i.quantidade);
+                new ProdutoEntity(i.produtoId),
+                i.quantidade);
         });
 
         return pedido;

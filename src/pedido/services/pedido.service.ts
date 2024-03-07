@@ -12,11 +12,13 @@ import { ClienteMySqlRepositoryGateway } from '../../cliente/gateways';
 import { ObterClienteUseCase } from '../../cliente/usecases';
 import { ProdutoMySqlRepositoryGateway } from '../../produto/gateways';
 import { ObterProdutoUseCase } from '../../produto/usecases';
-import { PedidoMySqlRepositoryGateway } from '../gateways';
+import { PedidoMySqlRepositoryGateway, SqsGateway } from '../gateways';
 import { AtualizarStatusPedidoUseCase, CriarPedidoUseCase } from '../usecases';
 import { PedidoCriarDto, PedidoRetornoDto } from '../dtos';
 import { PedidoCriarRetornoDto } from '../dtos/PedidoCriarRetornoDto';
 import { PedidoStatusEnum } from '../types';
+import { ISqsGateway } from '../interfaces/ISqsGateway';
+import { AwsConfigService } from 'src/config/aws';
 
 export class PedidoService {
 
@@ -30,6 +32,7 @@ export class PedidoService {
 
   private readonly produtoRepositoryGateway: IProdutoRepositoryGateway;
   private readonly obterProdutoUseCase: IObterProdutoUseCase;
+  private readonly sqsGateway: ISqsGateway;
 
   // private readonly pagamentoRepositoryGateway: IPagamentoRepositoryGateway;
   // private readonly obterPagamentoUseCase: IObterPagamentoUseCase;
@@ -49,6 +52,9 @@ export class PedidoService {
     this.produtoRepositoryGateway = new ProdutoMySqlRepositoryGateway(dataSource, logger);
     this.obterProdutoUseCase = new ObterProdutoUseCase(this.produtoRepositoryGateway, logger);
 
+    let awsConfigService = new AwsConfigService();
+    this.sqsGateway = new SqsGateway(awsConfigService);
+
     // this.pagamentoRepositoryGateway = new PagamentoMySqlRepositoryGateway(this.dataSource, this.logger);
     // this.obterPagamentoUseCase = new ObterPagamentoUseCase(this.pagamentoRepositoryGateway, this.logger);
     // this.pagamentoMpServiceHttpGateway = new PagamentoMockServiceHttpGateway(this.logger);
@@ -59,11 +65,11 @@ export class PedidoService {
     this.pedidoRepositoryGateway = new PedidoMySqlRepositoryGateway(dataSource, logger);
     // this.obterPedidoUseCase = new ObterPedidoUseCase(this.pedidoRepositoryGateway, this.obterPagamentoUseCase, logger);
     this.criarPedidoUseCase = new CriarPedidoUseCase(this.pedidoRepositoryGateway,
-       this.obterProdutoUseCase, this.obterClienteUseCase,logger);
-      // new CriarPedidoUseCase(this.pedidoRepositoryGateway,
-      // this.obterProdutoUseCase, this.obterClienteUseCase, this.gerarQrCodeMpUseCase,
-      // this.criarPagamentoUseCase, this.definirQrCodePagamentoUseCase, logger);
-    this.atualizarStatusPedidoUseCase = new AtualizarStatusPedidoUseCase(this.pedidoRepositoryGateway, logger);
+      this.obterProdutoUseCase, this.obterClienteUseCase, this.sqsGateway, logger);
+    // new CriarPedidoUseCase(this.pedidoRepositoryGateway,
+    // this.obterProdutoUseCase, this.obterClienteUseCase, this.gerarQrCodeMpUseCase,
+    // this.criarPagamentoUseCase, this.definirQrCodePagamentoUseCase, logger);
+    this.atualizarStatusPedidoUseCase = new AtualizarStatusPedidoUseCase(this.pedidoRepositoryGateway, this.sqsGateway, logger);
   }
 
   async obterPorId(id: number): Promise<PedidoRetornoDto> {
