@@ -1,4 +1,5 @@
 import {ClienteAlterarDto, ClienteDto, ClienteRetornoDto} from "../dtos";
+import { ClienteAlterarStatusDto } from "../dtos/ClienteAlterarStatusDto";
 
 export const IClienteRepositoryGateway: unique symbol = Symbol("IClienteRepositoryGateway");
 export interface IClienteRepositoryGateway {
@@ -7,4 +8,6 @@ export interface IClienteRepositoryGateway {
     obterPorEmail(email: string): Promise<ClienteRetornoDto>;
     criar(dto: ClienteDto): Promise<ClienteRetornoDto>;
     alterar(dto: ClienteAlterarDto): Promise<ClienteRetornoDto>;
+    inativar(dto: ClienteAlterarStatusDto): Promise<ClienteRetornoDto>;
+    excluir(dto: ClienteAlterarStatusDto): Promise<ClienteRetornoDto>;
 }

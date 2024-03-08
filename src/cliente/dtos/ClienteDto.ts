@@ -26,4 +26,16 @@ export class ClienteDto {
         example: "cliente@teste.com.br"
     })
     public email?: string;
+
+    @ApiProperty({
+        description: "Ativo",
+        example: "false"
+    })
+    public ativo: boolean;
+
+    @ApiProperty({
+        description: "Excluído",
+        example: "false"
+    })
+    public excluido: boolean;
 }

@@ -1,8 +1,9 @@
-import {Body, Controller, Get, Inject, Logger, Param, Post, Put} from "@nestjs/common";
+import {Body, Controller, Get, Inject, Logger, Param, Patch, Post, Put} from "@nestjs/common";
 import {DataSource} from "typeorm";
 import {DATA_SOURCE} from "../../common/constants";
 import {ClienteService} from "../services";
 import {ClienteAlterarDto, ClienteCriarDto} from "../dtos";
+import { ClienteAlterarStatusDto } from "../dtos/ClienteAlterarStatusDto";
 
 @Controller("/clientes")
 export class ClienteController {
@@ -39,5 +40,15 @@ export class ClienteController {
   async alterarCliente(@Body() clienteDto: ClienteAlterarDto, @Param("id") id: number){
     clienteDto.id = id;
     return await this.clienteService.alterar(clienteDto);
+  }
+
+  @Patch("/:id")
+  async inativarCliente(@Body() clienteDto: ClienteAlterarStatusDto){
+    return await this.clienteService.inativarCliente(clienteDto);
+  }
+
+  @Patch("/:id")
+  async excluirCliente(@Body() clienteDto: ClienteAlterarStatusDto){
+    return await this.clienteService.excluirCliente(clienteDto);
   }
 }
