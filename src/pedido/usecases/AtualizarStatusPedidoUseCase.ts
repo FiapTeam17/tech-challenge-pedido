@@ -1,6 +1,6 @@
 import { IAtualizarStatusPedidoUseCase, IPedidoRepositoryGateway } from '../interfaces';
 import { BadRequestException, Logger } from '@nestjs/common';
-import { PedidoStatusEnum } from '../types';
+import { PedidoStatusEnum, StatusPedidoEnumMapper } from '../types';
 import { PedidoDto } from '../dtos';
 import { PedidoEntity } from '../entities';
 import { ISqsGateway } from '../interfaces/ISqsGateway';
@@ -26,6 +26,11 @@ export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCa
 
         const pedido = PedidoEntity.getInstance(pedidoDto);
         pedido.setStatus(status);
+
+        if (pedido.getStatus() === PedidoStatusEnum.EM_PREPARACAO) {
+            this.sqsGateway.sendMessage(this.sqsUrl.concat("pedido-to-producao-criar-pedido"), pedidoDto);
+        }
+
         await this.pedidoRepositoryGateway.atualizarStatus(pedido.toPedidoDto());
 
         const filaProducao: any = {

@@ -42,8 +42,6 @@ export class CriarPedidoUseCase implements ICriarPedidoUseCase {
             pedido.id = id;
         }
 
-        this.sqsGateway.sendMessage(this.sqsUrl.concat("pedido-to-producao-criar-pedido"), pedidoDto);
-
         const filaPagamento: any = {
 
             idPedido: pedido.id,
