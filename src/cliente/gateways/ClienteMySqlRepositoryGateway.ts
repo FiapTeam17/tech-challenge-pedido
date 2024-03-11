@@ -17,12 +17,16 @@ export class ClienteMySqlRepositoryGateway implements IClienteRepositoryGateway 
     }
 
     async inativar(dto: ClienteAlterarStatusDto): Promise<ClienteRetornoDto> {
-        const result = await this.clienteRepository.query("UPDATE Cliente SET inativo = 1 WHERE Cliente.email = ? OR Cliente.cpf = ?", [dto.email, dto.cpf])
-        return result.getClientDto();
+        const clienteModel = new ClienteModel(dto);
+        clienteModel.ativo = false;
+        await this.clienteRepository.query("UPDATE Cliente SET ativo = ? WHERE Cliente.email = ? OR Cliente.cpf = ?", [clienteModel.ativo, dto.email, dto.cpf])
+        return clienteModel.getClientDto();
     }
     async excluir(dto: ClienteAlterarStatusDto): Promise<ClienteRetornoDto> {
-        const result = await this.clienteRepository.query("UPDATE Cliente SET excluido = 1 WHERE Cliente.email = ? OR Cliente.cpf = ?", [dto.email, dto.cpf])
-        return result.getClientDto();
+        const clienteModel = new ClienteModel(dto);
+        clienteModel.excluido = true;
+        await this.clienteRepository.query("UPDATE Cliente SET excluido = ? WHERE Cliente.email = ? OR Cliente.cpf = ?", [clienteModel.excluido, dto.email, dto.cpf])
+        return clienteModel.getClientDto();
     }
 
     async alterar(dto: ClienteAlterarDto): Promise<ClienteRetornoDto> {
@@ -68,4 +72,5 @@ export class ClienteMySqlRepositoryGateway implements IClienteRepositoryGateway 
 
         return clienteEntity?.getClientDto();
     }
+
 }

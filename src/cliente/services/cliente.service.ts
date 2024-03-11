@@ -11,6 +11,7 @@ import {AlterarClienteUseCase, CriarClienteUseCase, ObterClienteUseCase} from ".
 import {ClienteAlterarDto, ClienteCriarDto, ClienteRetornoDto} from "../dtos";
 import { ClienteAlterarStatusDto } from "../dtos/ClienteAlterarStatusDto";
 import { IAlterarStatusClienteUseCase } from "../interfaces/IAlterarStatusClienteUseCase";
+import { AlterarStatusClienteUseCase } from "../usecases/AlterarStatusClienteUseCase";
 
 export class ClienteService {
   private readonly clienteRepositoryGateway: IClienteRepositoryGateway;
@@ -27,6 +28,7 @@ export class ClienteService {
     this.obterClienteUseCase = new ObterClienteUseCase(this.clienteRepositoryGateway, logger);
     this.criarClienteUseCase = new CriarClienteUseCase(this.clienteRepositoryGateway, logger);
     this.alterarClienteUseCase = new AlterarClienteUseCase(this.clienteRepositoryGateway, logger);
+    this.alterarStatusClienteUseCase = new AlterarStatusClienteUseCase(this.clienteRepositoryGateway, this.obterClienteUseCase, logger)
   }
 
   async obterPorId(id: number): Promise<ClienteRetornoDto>{
