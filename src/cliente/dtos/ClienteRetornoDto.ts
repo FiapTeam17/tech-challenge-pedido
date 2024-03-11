@@ -31,13 +31,13 @@ export class ClienteRetornoDto{
         description: "Ativo",
         example: "false"
     })
-    public readonly ativo: boolean;
+    public readonly ativo?: boolean;
 
     @ApiProperty({
         description: "Excluído",
         example: "false"
     })
-    public readonly excluido: boolean;
+    public readonly excluido?: boolean;
 
     constructor(nome?: string, cpf?: string, email?: string, id?: number, ativo?: boolean, excluido?: boolean) {
         this.id = id;

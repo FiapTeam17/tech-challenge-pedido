@@ -31,11 +31,11 @@ export class ClienteDto {
         description: "Ativo",
         example: "false"
     })
-    public ativo: boolean;
+    public ativo?: boolean;
 
     @ApiProperty({
         description: "Excluído",
         example: "false"
     })
-    public excluido: boolean;
+    public excluido?: boolean;
 }
