@@ -37,7 +37,6 @@ export class ClienteMySqlRepositoryGateway implements IClienteRepositoryGateway 
     }
 
     async criar(dto: ClienteDto): Promise<ClienteRetornoDto> {
-
         const clienteModel = await this.clienteRepository.save(new ClienteModel(dto));
         return clienteModel.getClientDto();
     }

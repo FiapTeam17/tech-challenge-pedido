@@ -1,4 +1,5 @@
 import {ApiProperty} from "@nestjs/swagger";
+import { ClienteCriarDto } from "./ClienteCriarDto";
 
 export class ClienteDto {
 
@@ -38,4 +39,20 @@ export class ClienteDto {
         example: "false"
     })
     public excluido?: boolean;
+
+    constructor(
+         nome?: string,
+         id?: number,
+         cpf?: string,
+         email?: string,
+         ativo?: boolean,
+         excluido?: boolean
+      ) {
+        this.cpf = cpf;
+        this.id = id;
+        this.email = email;
+        this.nome = nome;
+        this.ativo = ativo;
+        this.excluido = excluido;
+      }
 }

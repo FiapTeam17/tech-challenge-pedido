@@ -42,12 +42,12 @@ export class ClienteController {
     return await this.clienteService.alterar(clienteDto);
   }
 
-  @Patch("/:id")
+  @Patch("/inativar")
   async inativarCliente(@Body() clienteDto: ClienteAlterarStatusDto){
     return await this.clienteService.inativarCliente(clienteDto);
   }
 
-  @Patch("/:id")
+  @Patch("/excluir")
   async excluirCliente(@Body() clienteDto: ClienteAlterarStatusDto){
     return await this.clienteService.excluirCliente(clienteDto);
   }

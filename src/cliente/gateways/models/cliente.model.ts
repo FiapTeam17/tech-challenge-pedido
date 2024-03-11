@@ -51,6 +51,8 @@ export class ClienteModel {
             this.nome = cliente.nome;
             this.email = cliente.email;
             this.cpf = cliente.cpf;
+            this.ativo = cliente.ativo;
+            this.excluido = cliente.excluido;
         }
     }
 
