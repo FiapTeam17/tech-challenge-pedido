@@ -1,4 +1,4 @@
-import { AwsConfigService } from "src/config/aws";
+import { AwsConfigService } from "../../config/aws";
 import { ISqsGateway } from "../interfaces/ISqsGateway";
 
 export class SqsGateway implements ISqsGateway {

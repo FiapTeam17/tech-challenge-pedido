@@ -83,4 +83,8 @@ export class PedidoService {
   async atualizarStatus(pedidoId: number, status: PedidoStatusEnum): Promise<void> {
     return await this.atualizarStatusPedidoUseCase.atualizarStatus(pedidoId, status);
   }
+
+  async atualizarStatusPagamento(pedidoId: number, status: string): Promise<void> {
+    return await this.atualizarStatusPedidoUseCase.atualizarStatusPagamento(pedidoId, status);
+  }
 }
