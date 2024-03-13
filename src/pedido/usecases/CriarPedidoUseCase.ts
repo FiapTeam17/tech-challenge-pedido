@@ -19,12 +19,9 @@ export class CriarPedidoUseCase implements ICriarPedidoUseCase {
         private obterProdutoUseCase: IObterProdutoUseCase,
         private obterClienteUseCase: IObterClienteUseCase,
         private readonly sqsGateway: ISqsGateway,
-        // private gerarQrCodeMpUseCase: IGerarQrCodeMpUseCase,
-        // private criarPagamentoUseCase: ICriarPagamentoUseCase,
-        // private definirQrCodePagamentoUseCase: IDefinirQrCodePagamentoUseCase,
         private logger: Logger
     ) {
-        this.sqsUrl = process.env.QUEUE_URL || "https://sqs.us-east-1.amazonaws.com/637423294426/";
+        this.sqsUrl = process.env.QUEUE_URL || "https://sqs.us-east-2.amazonaws.com/258775715661/";
     }
 
     async criar(pedidoDto: PedidoCriarDto): Promise<PedidoCriarRetornoDto> {
@@ -44,21 +41,12 @@ export class CriarPedidoUseCase implements ICriarPedidoUseCase {
 
         const filaPagamento: any = {
 
-            idPedido: pedido.id,
-            valorTotal: pedido.valorTotal,
+            identificador: pedido.id,
+            valor: pedido.valorTotal,
         };
 
-        this.sqsGateway.sendMessage(this.sqsUrl.concat("pedido-to-pagamento"), filaPagamento);
+        await this.sqsGateway.sendMessage(`Pedido${pedido.id}`, this.sqsUrl.concat("pedido-to-pagamento.fifo"), filaPagamento);
 
-        // let pag = new PagamentoDto(undefined, pedido.id);
-        //
-        // pag = await this.criarPagamentoUseCase.criar(pag);
-        //
-        // const qrCodeResponseDto = await this.gerarQrCodeMpUseCase.gerarQrCode(pag.id as number, pedido.valorTotal);
-        // pag.qrCode = qrCodeResponseDto.qr_data;
-        //
-        // await this.definirQrCodePagamentoUseCase.atualizar(pag.id as number, pag.qrCode);
-        //
         const respPedidoDto = pedido.toPedidoDto();
 
         const resp: PedidoCriarRetornoDto = { ...respPedidoDto, qrCodeMercadoPago: undefined, itens: [] };

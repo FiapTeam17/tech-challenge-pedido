@@ -14,13 +14,12 @@ export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCa
         private readonly sqsGateway: ISqsGateway,
         private logger: Logger
     ) {
-        this.sqsUrl = process.env.QUEUE_URL || "https://sqs.us-east-1.amazonaws.com/637423294426/";
+        this.sqsUrl = process.env.QUEUE_URL || "https://sqs.us-east-2.amazonaws.com/258775715661/";
     }
 
     async atualizarStatus(pedidoId: number, status: PedidoStatusEnum): Promise<void> {
         const pedidoDto: PedidoDto = await this.pedidoRepositoryGateway.obterPorId(pedidoId);
-        if (pedidoDto == undefined) {
-            this.logger.warn("Pedido id={} não encontrado", pedidoId);
+        if (pedidoDto === undefined) {
             throw new BadRequestException("Produto não encontrado!");
         }
 
@@ -32,16 +31,15 @@ export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCa
 
     async atualizarStatusPagamento(identificador: number, status: StatusPagamentoEnum): Promise<void> {
         const pedidoDto: PedidoDto = await this.pedidoRepositoryGateway.obterPorId(identificador);
-        if (pedidoDto == undefined) {
-            this.logger.warn("Pedido id={} não encontrado", identificador);
+        if (pedidoDto === undefined) {
             throw new BadRequestException("Produto não encontrado!");
         }
 
         if (status === StatusPagamentoEnum.PAGO) {
-            this.sqsGateway.sendMessage(this.sqsUrl.concat("pedido-to-producao-criar-pedido"), pedidoDto);
+            await this.sqsGateway.sendMessage(`Pedido${identificador}`, this.sqsUrl.concat("pedido-to-producao-criar-pedido.fifo"), pedidoDto);
         }
         else if (status === StatusPagamentoEnum.CANCELADO || status === StatusPagamentoEnum.ERRO) {
-            this.atualizarStatus(identificador, PedidoStatusEnum.PROBLEMA_DE_PAGAMENTO)
+            await this.atualizarStatus(identificador, PedidoStatusEnum.PROBLEMA_DE_PAGAMENTO)
         }
     }
 }
