@@ -4,6 +4,7 @@ import { PedidoStatusEnum, StatusPedidoEnumMapper, StatusPagamentoEnum } from '.
 import { PedidoDto } from '../dtos';
 import { PedidoEntity } from '../entities';
 import { ISqsGateway } from '../interfaces/ISqsGateway';
+import { PedidoProducaoDto, PedidoProducaoItemDto } from '../dtos/producao/PedidoProducaoDto';
 
 export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCase {
 
@@ -40,7 +41,22 @@ export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCa
             pedido.setStatus(PedidoStatusEnum.RECEBIDO);
 
             await this.pedidoRepositoryGateway.atualizarStatus(pedido.toPedidoDto());
-            await this.sqsGateway.sendMessage(`Pedido${identificador}`, this.sqsUrl.concat("pedido-to-producao-criar-pedido.fifo"), pedidoDto);
+
+            let pedidoProducao = new PedidoProducaoDto();
+            pedidoProducao.numero = pedidoDto.id;
+            pedidoProducao.identificacao = pedidoDto.cliente != undefined ? pedidoDto.cliente.nome : pedidoDto.id.toString();
+            pedidoProducao.observacao = pedidoDto.observacao;
+
+            pedidoDto.itens.forEach( item => {
+                let itemProducao = new PedidoProducaoItemDto();
+                itemProducao.nomeProduto = item.produto.nome;
+                itemProducao.produtoId = item.produto.id;
+                itemProducao.quantidade = item.quantidade;
+                pedidoProducao.itens.push(itemProducao);
+            });
+
+            await this.sqsGateway.sendMessage(`Pedido${identificador}`,
+              this.sqsUrl.concat("pedido-to-producao-criar-pedido.fifo"), pedidoProducao);
         }
         else if (status === StatusPagamentoEnum.CANCELADO || status === StatusPagamentoEnum.ERRO) {
             await this.atualizarStatus(identificador, PedidoStatusEnum.PROBLEMA_DE_PAGAMENTO)
