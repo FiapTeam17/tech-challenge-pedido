@@ -20,7 +20,7 @@ export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCa
     async atualizarStatus(pedidoId: number, status: PedidoStatusEnum): Promise<void> {
         const pedidoDto: PedidoDto = await this.pedidoRepositoryGateway.obterPorId(pedidoId);
         if (pedidoDto === undefined) {
-            throw new BadRequestException("Produto não encontrado!");
+            throw new BadRequestException("Pedido não encontrado!");
         }
 
         const pedido = PedidoEntity.getInstance(pedidoDto);
@@ -36,6 +36,10 @@ export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCa
         }
 
         if (status === StatusPagamentoEnum.PAGO) {
+            const pedido = PedidoEntity.getInstance(pedidoDto);
+            pedido.setStatus(PedidoStatusEnum.RECEBIDO);
+
+            await this.pedidoRepositoryGateway.atualizarStatus(pedido.toPedidoDto());
             await this.sqsGateway.sendMessage(`Pedido${identificador}`, this.sqsUrl.concat("pedido-to-producao-criar-pedido.fifo"), pedidoDto);
         }
         else if (status === StatusPagamentoEnum.CANCELADO || status === StatusPagamentoEnum.ERRO) {

@@ -13,7 +13,7 @@ import { ObterClienteUseCase } from '../../cliente/usecases';
 import { ProdutoMySqlRepositoryGateway } from '../../produto/gateways';
 import { ObterProdutoUseCase } from '../../produto/usecases';
 import { PedidoMySqlRepositoryGateway, SqsGateway } from '../gateways';
-import { AtualizarStatusPedidoUseCase, CriarPedidoUseCase } from '../usecases';
+import { AtualizarStatusPedidoUseCase, CriarPedidoUseCase, ObterPedidoUseCase } from '../usecases';
 import { PedidoCriarDto, PedidoRetornoDto } from '../dtos';
 import { PedidoCriarRetornoDto } from '../dtos/PedidoCriarRetornoDto';
 import { PedidoStatusEnum } from '../types';
@@ -34,14 +34,6 @@ export class PedidoService {
   private readonly obterProdutoUseCase: IObterProdutoUseCase;
   private readonly sqsGateway: ISqsGateway;
 
-  // private readonly pagamentoRepositoryGateway: IPagamentoRepositoryGateway;
-  // private readonly obterPagamentoUseCase: IObterPagamentoUseCase;
-  // private readonly gerarQrCodeMpUseCase: IGerarQrCodeMpUseCase;
-  // private readonly criarPagamentoUseCase: ICriarPagamentoUseCase;
-  // private readonly definirQrCodePagamentoUseCase: IDefinirQrCodePagamentoUseCase;
-
-  // private readonly pagamentoMpServiceHttpGateway: IPagamentoMpServiceHttpGateway;
-
   constructor(
     private dataSource: DataSource,
     private logger: Logger
@@ -55,20 +47,10 @@ export class PedidoService {
     let awsConfigService = new AwsConfigService();
     this.sqsGateway = new SqsGateway(awsConfigService);
 
-    // this.pagamentoRepositoryGateway = new PagamentoMySqlRepositoryGateway(this.dataSource, this.logger);
-    // this.obterPagamentoUseCase = new ObterPagamentoUseCase(this.pagamentoRepositoryGateway, this.logger);
-    // this.pagamentoMpServiceHttpGateway = new PagamentoMockServiceHttpGateway(this.logger);
-    // this.gerarQrCodeMpUseCase = new GerarQrCodeMpUseCase(this.pagamentoMpServiceHttpGateway, this.logger);
-    // this.criarPagamentoUseCase = new CriarPagamentoUseCase(this.pagamentoRepositoryGateway, this.logger);
-    // this.definirQrCodePagamentoUseCase = new DefinirQrCodePagamentoUseCase(this.pagamentoRepositoryGateway, this.logger);
-
     this.pedidoRepositoryGateway = new PedidoMySqlRepositoryGateway(dataSource, logger);
-    // this.obterPedidoUseCase = new ObterPedidoUseCase(this.pedidoRepositoryGateway, this.obterPagamentoUseCase, logger);
     this.criarPedidoUseCase = new CriarPedidoUseCase(this.pedidoRepositoryGateway,
       this.obterProdutoUseCase, this.obterClienteUseCase, this.sqsGateway, logger);
-    // new CriarPedidoUseCase(this.pedidoRepositoryGateway,
-    // this.obterProdutoUseCase, this.obterClienteUseCase, this.gerarQrCodeMpUseCase,
-    // this.criarPagamentoUseCase, this.definirQrCodePagamentoUseCase, logger);
+    this.obterPedidoUseCase = new ObterPedidoUseCase(this.pedidoRepositoryGateway, logger);
     this.atualizarStatusPedidoUseCase = new AtualizarStatusPedidoUseCase(this.pedidoRepositoryGateway, this.sqsGateway, logger);
   }
 

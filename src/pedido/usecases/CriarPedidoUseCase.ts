@@ -41,7 +41,7 @@ export class CriarPedidoUseCase implements ICriarPedidoUseCase {
 
         const filaPagamento: any = {
 
-            identificador: pedido.id,
+            identificador: pedido.id.toString(),
             valor: pedido.valorTotal,
         };
 

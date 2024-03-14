@@ -35,9 +35,8 @@ export class PedidoController {
         await this.pedidoService.atualizarStatus(id, StatusPedidoEnumMapper.stringParaEnum(pedidoDto.status as unknown as string));
     }
 
-    //Criar nova rota para receber status de pagamento
     @Patch("/:identificador/:statusPagamento")
-    async atualizarStatusPagamento(@Param("id") identificador: number, statusPagamento: string): Promise<void> {
+    async atualizarStatusPagamento(@Param("identificador") identificador: number, @Param("statusPagamento") statusPagamento: string): Promise<void> {
         if (statusPagamento === undefined) {
             throw new BadRequestException("Status deve ser informado");
         }
