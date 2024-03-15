@@ -43,11 +43,11 @@ export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCa
             await this.pedidoRepositoryGateway.atualizarStatus(pedido.toPedidoDto());
 
             let pedidoProducao = new PedidoProducaoDto();
-            pedidoProducao.numero = pedidoDto.id;
-            pedidoProducao.identificacao = pedidoDto.cliente != undefined ? pedidoDto.cliente.nome : pedidoDto.id.toString();
+            pedidoProducao.identificacaoPedido = pedidoDto.id;
+            pedidoProducao.identificacaoCliente = pedidoDto.cliente != undefined ? pedidoDto.cliente.nome : pedidoDto.id.toString();
             pedidoProducao.observacao = pedidoDto.observacao;
 
-            pedidoDto.itens.forEach( item => {
+            pedidoDto.itens.forEach(item => {
                 let itemProducao = new PedidoProducaoItemDto();
                 itemProducao.nomeProduto = item.produto.nome;
                 itemProducao.produtoId = item.produto.id;
@@ -56,7 +56,7 @@ export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCa
             });
 
             await this.sqsGateway.sendMessage(`Pedido${identificador}`,
-              this.sqsUrl.concat("pedido-to-producao-criar-pedido.fifo"), pedidoProducao);
+                this.sqsUrl.concat("pedido-to-producao-criar-pedido.fifo"), pedidoProducao);
         }
         else if (status === StatusPagamentoEnum.CANCELADO || status === StatusPagamentoEnum.ERRO) {
             await this.atualizarStatus(identificador, PedidoStatusEnum.PROBLEMA_DE_PAGAMENTO)

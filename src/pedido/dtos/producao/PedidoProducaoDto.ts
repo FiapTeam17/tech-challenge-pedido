@@ -6,7 +6,7 @@ export class PedidoProducaoItemDto {
 
 export class PedidoProducaoDto {
   public observacao?: string;
-  public identificacao?: string;
-  public numero?: number;
+  public identificacaoPedido?: number;
+  public identificacaoCliente?: string;
   public itens: PedidoProducaoItemDto[] = [];
 }
