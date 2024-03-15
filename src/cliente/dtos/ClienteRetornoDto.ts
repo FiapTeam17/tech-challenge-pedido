@@ -27,11 +27,25 @@ export class ClienteRetornoDto{
     })
     public readonly email?: string;
 
-    constructor(nome?: string, cpf?: string, email?: string, id?: number) {
+    @ApiProperty({
+        description: "Ativo",
+        example: "false"
+    })
+    public readonly ativo?: boolean;
+
+    @ApiProperty({
+        description: "Excluído",
+        example: "false"
+    })
+    public readonly excluido?: boolean;
+
+    constructor(nome?: string, cpf?: string, email?: string, id?: number, ativo?: boolean, excluido?: boolean) {
         this.id = id;
         this.nome = nome;
         this.cpf = cpf;
         this.email = email;
+        this.ativo = ativo;
+        this.excluido = excluido;
     }
 
 }

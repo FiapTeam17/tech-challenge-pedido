@@ -26,4 +26,15 @@ export class ClienteAlterarDto {
         example: "cliente@teste.com.br"
     })
     public readonly email?: string;
-}
+
+    @ApiProperty({
+        description: "Ativo",
+        example: "false"
+    })
+    public readonly ativo: boolean;
+
+    @ApiProperty({
+        description: "Excluído",
+        example: "false"
+    })
+    public readonly excluido: boolean;}
