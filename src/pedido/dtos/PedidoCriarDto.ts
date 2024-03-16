@@ -31,13 +31,8 @@ export class PedidoCriarDto {
 
     @ApiProperty({
         description: "Itens do Pedido",
-        type: 'array',
-        items: {
-            oneOf: [
-                { $ref: getSchemaPath(PedidoItemCriarDto) }
-            ],
-        },
-
+        isArray: true,
+        type: () => PedidoItemCriarDto,
     })
     public readonly itens: PedidoItemCriarDto[];
 }
