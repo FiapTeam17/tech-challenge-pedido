@@ -5,6 +5,7 @@ import { PedidoDto } from '../dtos';
 import { PedidoEntity } from '../entities';
 import { ISqsGateway } from '../interfaces/ISqsGateway';
 import { PedidoProducaoDto, PedidoProducaoItemDto } from '../dtos/producao/PedidoProducaoDto';
+import { StatusPagamentoEnumMapper } from '../types/StatusPagamentoEnumMapper';
 
 export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCase {
 
@@ -26,17 +27,18 @@ export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCa
 
         const pedido = PedidoEntity.getInstance(pedidoDto);
         pedido.setStatus(status);
-
         await this.pedidoRepositoryGateway.atualizarStatus(pedido.toPedidoDto());
     }
 
-    async atualizarStatusPagamento(identificador: number, status: StatusPagamentoEnum): Promise<void> {
+    async atualizarStatusPagamento(identificador: number, status: string): Promise<void> {
         const pedidoDto: PedidoDto = await this.pedidoRepositoryGateway.obterPorId(identificador);
         if (pedidoDto === undefined) {
             throw new BadRequestException("Produto não encontrado!");
         }
 
-        if (status === StatusPagamentoEnum.PAGO) {
+        const statusEnun = StatusPagamentoEnumMapper.stringParaEnum(status);
+
+        if (statusEnun === StatusPagamentoEnum.PAGO) {
             const pedido = PedidoEntity.getInstance(pedidoDto);
             pedido.setStatus(PedidoStatusEnum.RECEBIDO);
 
@@ -58,7 +60,9 @@ export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCa
             await this.sqsGateway.sendMessage(`Pedido${identificador}`,
                 this.sqsUrl.concat("pedido-to-producao-criar-pedido.fifo"), pedidoProducao);
         }
-        else if (status === StatusPagamentoEnum.CANCELADO || status === StatusPagamentoEnum.ERRO) {
+        else if (statusEnun === StatusPagamentoEnum.CANCELADO ||
+                 statusEnun === StatusPagamentoEnum.ERRO ||
+                 status == StatusPagamentoEnum.REJEITADO) {
             await this.atualizarStatus(identificador, PedidoStatusEnum.PROBLEMA_DE_PAGAMENTO)
         }
     }
