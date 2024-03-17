@@ -28,6 +28,11 @@ export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCa
         const pedido = PedidoEntity.getInstance(pedidoDto);
         pedido.setStatus(status);
         await this.pedidoRepositoryGateway.atualizarStatus(pedido.toPedidoDto());
+
+        if(status === PedidoStatusEnum.PRONTO) {
+            await this.sqsGateway.sendMessage(`Pedido${pedidoDto.id}`,
+              this.sqsUrl.concat('notifica-cliente.fifo'), "Pedido pronto!");
+        }
     }
 
     async atualizarStatusPagamento(identificador: number, status: string): Promise<void> {
@@ -64,6 +69,9 @@ export class AtualizarStatusPedidoUseCase implements IAtualizarStatusPedidoUseCa
                  statusEnun === StatusPagamentoEnum.ERRO ||
                  status == StatusPagamentoEnum.REJEITADO) {
             await this.atualizarStatus(identificador, PedidoStatusEnum.PROBLEMA_DE_PAGAMENTO)
+
+            await this.sqsGateway.sendMessage(`Pedido${identificador}`,
+              this.sqsUrl.concat("notifica-cliente.fifo"), "Pagamento não confirmado!");
         }
     }
 }
