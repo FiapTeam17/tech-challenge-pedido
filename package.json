@@ -28,7 +28,8 @@
     "mysql2": "^3.7.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.19"
+    "typeorm": "^0.3.19",
+    "aws-sdk": "^2.1576.0"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^10.3.1",

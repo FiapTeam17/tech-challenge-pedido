@@ -1,4 +1,4 @@
-import {ClienteDto, ClienteRetornoDto} from "../../dtos";
+import {ClienteAlterarDto, ClienteDto, ClienteRetornoDto} from "../../dtos";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { PedidoModel } from '../../../pedido/gateways';
 
@@ -28,10 +28,22 @@ export class ClienteModel {
     })
     email?: string;
 
+    @Column({
+        type: "boolean",
+        nullable: false
+    })
+    ativo: boolean;
+
+    @Column({
+        type: "boolean",
+        nullable: false
+    })
+    excluido: boolean;
+
     @OneToMany(() => PedidoModel, (pedido) => pedido.cliente)
     pedidos?: PedidoModel[];
 
-    constructor(cliente?: ClienteDto){
+    constructor(cliente?: ClienteDto, ativo?: boolean, excluido?: boolean){
         if(cliente){
             if(cliente.id){
                 this.id = cliente.id;
@@ -39,10 +51,12 @@ export class ClienteModel {
             this.nome = cliente.nome;
             this.email = cliente.email;
             this.cpf = cliente.cpf;
+            this.ativo = cliente.ativo;
+            this.excluido = cliente.excluido;
         }
     }
 
     public getClientDto(): ClienteRetornoDto {
-        return new ClienteRetornoDto(this.nome, this.cpf, this.email, this.id);
+        return new ClienteRetornoDto(this.nome, this.cpf, this.email, this.id, this.ativo, this.excluido);
     }
 }

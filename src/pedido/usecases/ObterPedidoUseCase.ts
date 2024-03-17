@@ -6,7 +6,6 @@ export class ObterPedidoUseCase implements IObterPedidoUseCase {
 
     constructor(
         private pedidoRepositoryGateway: IPedidoRepositoryGateway,
-        // private obterPagamentoUseCase: IObterPagamentoUseCase,
         private logger: Logger
     ) {
     }

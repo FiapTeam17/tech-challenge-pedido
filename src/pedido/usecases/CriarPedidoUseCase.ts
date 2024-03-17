@@ -8,18 +8,21 @@ import { PedidoEntity, PedidoItemEntity } from '../entities';
 import { ClienteEntity } from '../../cliente/entities';
 import { ProdutoEntity } from '../../produto/entities';
 import { PedidoStatusEnum } from '../types';
+import { ISqsGateway } from '../interfaces/ISqsGateway';
 
 export class CriarPedidoUseCase implements ICriarPedidoUseCase {
+
+    private sqsUrl: string;
 
     constructor(
         private pedidoRepositoryGateway: IPedidoRepositoryGateway,
         private obterProdutoUseCase: IObterProdutoUseCase,
         private obterClienteUseCase: IObterClienteUseCase,
-        // private gerarQrCodeMpUseCase: IGerarQrCodeMpUseCase,
-        // private criarPagamentoUseCase: ICriarPagamentoUseCase,
-        // private definirQrCodePagamentoUseCase: IDefinirQrCodePagamentoUseCase,
+        private readonly sqsGateway: ISqsGateway,
         private logger: Logger
-    ) { }
+    ) {
+        this.sqsUrl = process.env.QUEUE_URL || "https://sqs.us-east-2.amazonaws.com/258775715661/";
+    }
 
     async criar(pedidoDto: PedidoCriarDto): Promise<PedidoCriarRetornoDto> {
         //TODO adicionar mapper
@@ -36,21 +39,20 @@ export class CriarPedidoUseCase implements ICriarPedidoUseCase {
             pedido.id = id;
         }
 
-        // let pag = new PagamentoDto(undefined, pedido.id);
-        //
-        // pag = await this.criarPagamentoUseCase.criar(pag);
-        //
-        // const qrCodeResponseDto = await this.gerarQrCodeMpUseCase.gerarQrCode(pag.id as number, pedido.valorTotal);
-        // pag.qrCode = qrCodeResponseDto.qr_data;
-        //
-        // await this.definirQrCodePagamentoUseCase.atualizar(pag.id as number, pag.qrCode);
-        //
+        const filaPagamento: any = {
+
+            identificador: pedido.id.toString(),
+            valor: pedido.valorTotal,
+        };
+
+        await this.sqsGateway.sendMessage(`Pedido${pedido.id}`, this.sqsUrl.concat("pedido-to-pagamento.fifo"), filaPagamento);
+
         const respPedidoDto = pedido.toPedidoDto();
 
-        const resp : PedidoCriarRetornoDto = {...respPedidoDto, qrCodeMercadoPago: undefined, itens: []};
+        const resp: PedidoCriarRetornoDto = { ...respPedidoDto, qrCodeMercadoPago: undefined, itens: [] };
 
         for (let i = 0; i < respPedidoDto.itens!.length; i++) {
-            resp.itens.push({...respPedidoDto.itens![i]});
+            resp.itens.push({ ...respPedidoDto.itens![i] });
         }
 
         return resp;
@@ -80,11 +82,11 @@ export class CriarPedidoUseCase implements ICriarPedidoUseCase {
                 throw new BadRequestException("Produto não encontrado!");
             }
 
-            if(item.quantidade === undefined){
+            if (item.quantidade === undefined) {
                 throw new BadRequestException("A quantidade deve ser informada!");
             }
 
-            if(item.quantidade <= 0){
+            if (item.quantidade <= 0) {
                 throw new BadRequestException("A quantidade deve ser maior que zero!");
             }
 
@@ -108,8 +110,8 @@ export class CriarPedidoUseCase implements ICriarPedidoUseCase {
 
         pedido.itens = pedidoDto.itens?.map(i => {
             return new PedidoItemEntity(undefined, pedido,
-              new ProdutoEntity(i.produtoId),
-              i.quantidade);
+                new ProdutoEntity(i.produtoId),
+                i.quantidade);
         });
 
         return pedido;

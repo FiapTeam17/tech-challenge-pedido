@@ -6,6 +6,8 @@ export class ClienteEntity {
     readonly nome?: string,
     readonly cpf?: string,
     readonly email?: string,
+    readonly ativo?: boolean,
+    readonly excluido?: boolean
   ) {}
 
   validar() {

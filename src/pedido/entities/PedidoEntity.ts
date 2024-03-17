@@ -96,6 +96,13 @@ export class PedidoEntity {
 
     setStatus(newStatus: PedidoStatusEnum) {
         switch (newStatus) {
+            case PedidoStatusEnum.PROBLEMA_DE_PAGAMENTO:
+                if (this._status === undefined || this._status === PedidoStatusEnum.AGUARDANDO_CONFIRMACAO_PAGAMENTO) {
+                    this._status = newStatus;
+                    return;
+                }
+                throw new BadRequestException("O status do pedido não permite essa alteração");
+
             case PedidoStatusEnum.AGUARDANDO_CONFIRMACAO_PAGAMENTO:
                 if (this._status === undefined || this._status === PedidoStatusEnum.AGUARDANDO_CONFIRMACAO_PAGAMENTO) {
                     this._status = newStatus;

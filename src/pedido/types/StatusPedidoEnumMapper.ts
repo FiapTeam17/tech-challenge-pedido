@@ -2,9 +2,9 @@ import { PedidoStatusEnum } from './PedidoStatusEnum';
 import { InternalServerErrorException } from '@nestjs/common';
 
 export class StatusPedidoEnumMapper {
-  
-  static numberParaEnum(codigo?: number): PedidoStatusEnum{
-    switch (codigo){
+
+  static numberParaEnum(codigo?: number): PedidoStatusEnum {
+    switch (codigo) {
       case 0:
         return PedidoStatusEnum.AGUARDANDO_CONFIRMACAO_PAGAMENTO;
       case 1:
@@ -15,13 +15,15 @@ export class StatusPedidoEnumMapper {
         return PedidoStatusEnum.PRONTO;
       case 4:
         return PedidoStatusEnum.FINALIZADO;
+      case 5:
+        return PedidoStatusEnum.PROBLEMA_DE_PAGAMENTO;
       default:
         throw new InternalServerErrorException("Status Inválido");
     }
   }
-  
-  static stringParaEnum(opcao?: string): PedidoStatusEnum{
-    switch (opcao){
+
+  static stringParaEnum(opcao?: string): PedidoStatusEnum {
+    switch (opcao) {
       case "AGUARDANDO_CONFIRMACAO_PAGAMENTO":
         return PedidoStatusEnum.AGUARDANDO_CONFIRMACAO_PAGAMENTO;
       case "RECEBIDO":
@@ -32,14 +34,16 @@ export class StatusPedidoEnumMapper {
         return PedidoStatusEnum.PRONTO;
       case "FINALIZADO":
         return PedidoStatusEnum.FINALIZADO;
+      case "PROBLEMA_DE_PAGAMENTO":
+        return PedidoStatusEnum.PROBLEMA_DE_PAGAMENTO;
       default:
         throw new InternalServerErrorException("Status Inválido");
     }
   }
 
-  static enumParaString(status? : PedidoStatusEnum): string {
+  static enumParaString(status?: PedidoStatusEnum): string {
 
-    switch (status){
+    switch (status) {
       case PedidoStatusEnum.AGUARDANDO_CONFIRMACAO_PAGAMENTO:
         return "AGUARDANDO_CONFIRMACAO_PAGAMENTO";
       case PedidoStatusEnum.RECEBIDO:
@@ -50,13 +54,15 @@ export class StatusPedidoEnumMapper {
         return "PRONTO";
       case PedidoStatusEnum.FINALIZADO:
         return "FINALIZADO";
+      case "PROBLEMA_DE_PAGAMENTO":
+        return PedidoStatusEnum.PROBLEMA_DE_PAGAMENTO;
       default:
         throw new InternalServerErrorException("Status Inválido");
     }
   }
 
-  static enumParaNumber(status? : PedidoStatusEnum): number{
-    switch (status){
+  static enumParaNumber(status?: PedidoStatusEnum): number {
+    switch (status) {
       case PedidoStatusEnum.AGUARDANDO_CONFIRMACAO_PAGAMENTO:
         return 0;
       case PedidoStatusEnum.RECEBIDO:
@@ -67,6 +73,8 @@ export class StatusPedidoEnumMapper {
         return 3;
       case PedidoStatusEnum.FINALIZADO:
         return 4;
+      case PedidoStatusEnum.PROBLEMA_DE_PAGAMENTO:
+        return 5;
 
       default:
         throw new InternalServerErrorException("Status Inválido");

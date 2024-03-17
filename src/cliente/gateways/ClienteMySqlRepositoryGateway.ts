@@ -3,6 +3,7 @@ import { ClienteModel } from './models';
 import { ClienteAlterarDto, ClienteDto, ClienteRetornoDto } from '../dtos';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { DataSource, In, Repository } from 'typeorm';
+import { ClienteAlterarStatusDto } from '../dtos/ClienteAlterarStatusDto';
 
 export class ClienteMySqlRepositoryGateway implements IClienteRepositoryGateway {
 
@@ -13,6 +14,19 @@ export class ClienteMySqlRepositoryGateway implements IClienteRepositoryGateway 
       private logger: Logger
     ) {
         this.clienteRepository = this.dataSource.getRepository(ClienteModel);
+    }
+
+    async inativar(dto: ClienteAlterarStatusDto): Promise<ClienteRetornoDto> {
+        const clienteModel = new ClienteModel(dto);
+        clienteModel.ativo = false;
+        await this.clienteRepository.query("UPDATE Cliente SET ativo = ? WHERE Cliente.email = ? OR Cliente.cpf = ?", [clienteModel.ativo, dto.email, dto.cpf])
+        return clienteModel.getClientDto();
+    }
+    async excluir(dto: ClienteAlterarStatusDto): Promise<ClienteRetornoDto> {
+        const clienteModel = new ClienteModel(dto);
+        clienteModel.excluido = true;
+        await this.clienteRepository.query("UPDATE Cliente SET excluido = ? WHERE Cliente.email = ? OR Cliente.cpf = ?", [clienteModel.excluido, dto.email, dto.cpf])
+        return clienteModel.getClientDto();
     }
 
     async alterar(dto: ClienteAlterarDto): Promise<ClienteRetornoDto> {
@@ -27,12 +41,11 @@ export class ClienteMySqlRepositoryGateway implements IClienteRepositoryGateway 
     }
 
     async criar(dto: ClienteDto): Promise<ClienteRetornoDto> {
-
         const clienteModel = await this.clienteRepository.save(new ClienteModel(dto));
         return clienteModel.getClientDto();
     }
 
-    async obterPorCpf(cpf: string): Promise<ClienteDto> {
+    async obterPorCpf(cpf: string): Promise<ClienteRetornoDto> {
 
         const clienteEntity = await this.clienteRepository.findOneBy(
           {
@@ -41,7 +54,7 @@ export class ClienteMySqlRepositoryGateway implements IClienteRepositoryGateway 
         return clienteEntity?.getClientDto();
     }
 
-    async obterPorEmail(email: string): Promise<ClienteDto> {
+    async obterPorEmail(email: string): Promise<ClienteRetornoDto> {
 
         const clienteEntity = await this.clienteRepository.findOneBy(
           {
@@ -50,7 +63,7 @@ export class ClienteMySqlRepositoryGateway implements IClienteRepositoryGateway 
         return clienteEntity?.getClientDto();
     }
 
-    async obterPorId(id: number): Promise<ClienteDto> {
+    async obterPorId(id: number): Promise<ClienteRetornoDto> {
 
         const clienteEntity = await this.clienteRepository.findOneBy(
           {
@@ -59,4 +72,5 @@ export class ClienteMySqlRepositoryGateway implements IClienteRepositoryGateway 
 
         return clienteEntity?.getClientDto();
     }
+
 }

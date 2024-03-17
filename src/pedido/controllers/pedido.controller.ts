@@ -12,17 +12,17 @@ export class PedidoController {
     private pedidoService: PedidoService;
     private readonly logger = new Logger(PedidoController.name);
     constructor(
-      @Inject(DATA_SOURCE) private dataSource: DataSource
+        @Inject(DATA_SOURCE) private dataSource: DataSource
     ) {
         this.pedidoService = new PedidoService(this.dataSource, this.logger);
     }
 
-    @Get("/:id")    
+    @Get("/:id")
     async obterPorId(@Param("id") id: number): Promise<PedidoRetornoDto> {
         return await this.pedidoService.obterPorId(id);
     }
 
-    @Post("")    
+    @Post("")
     async criar(@Body() pedidoDto: PedidoCriarDto): Promise<PedidoCriarRetornoDto> {
         return await this.pedidoService.criar(pedidoDto);
     }
@@ -33,5 +33,13 @@ export class PedidoController {
             throw new BadRequestException("Status deve ser informado");
         }
         await this.pedidoService.atualizarStatus(id, StatusPedidoEnumMapper.stringParaEnum(pedidoDto.status as unknown as string));
+    }
+
+    @Patch("/:identificador/:statusPagamento")
+    async atualizarStatusPagamento(@Param("identificador") identificador: number, @Param("statusPagamento") statusPagamento: string): Promise<void> {
+        if (statusPagamento === undefined) {
+            throw new BadRequestException("Status deve ser informado");
+        }
+        await this.pedidoService.atualizarStatusPagamento(identificador, statusPagamento);
     }
 }
